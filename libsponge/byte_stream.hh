@@ -11,13 +11,11 @@
 //! and then no more bytes can be written.
 class ByteStream {
   private:
-    // Your code here -- add private members as necessary.
-
-    // Hint: This doesn't need to be a sophisticated data structure at
-    // all, but if any of your tests are taking longer than a second,
-    // that's a sign that you probably want to keep exploring
-    // different approaches.
-
+  // Q: why are there underline symbols?
+  // A: In order to avoid variable shadowing
+  // Ref link: https://en.wikipedia.org/wiki/Variable_shadowing
+    
+    // Use double-ended queue
     std::deque<char> _buffer = {};
     size_t _capacity;
     size_t _readCount = 0;
