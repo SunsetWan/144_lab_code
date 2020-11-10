@@ -73,3 +73,40 @@ class StreamReassembler {
 };
 
 #endif  // SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
+
+
+// Here is an example to help myself understand 'goto label' clause
+// #include <iostream>
+// #include <string>
+// #include <set>
+
+// using namespace std;
+
+// void HAHA() {
+// 	cout << "HAHA" << endl;
+// }
+
+// void goToEqual(int a) {
+// 	if (a < 200) {
+// 		HAHA();
+// 		return;
+// 	}
+// 	cout << "222" << endl;
+// 	HAHA();
+// }
+
+// int main(int argc, char *argv[]) {
+// 	int a = 400;
+// 	if (a < 200) {
+// 		goto HAHA;
+// 	}
+	
+// 	cout << "222" << endl;
+	
+	
+// 	HAHA:
+// 		cout << "HAHA" << endl;
+		
+// 	cout << "===========" << endl;
+// 	goToEqual(a);
+// }
