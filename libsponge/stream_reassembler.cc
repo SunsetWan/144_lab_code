@@ -59,12 +59,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         // Two situation:
         // 1. this packet is duplicated, so we ignore it.
         // 2. all data have already been accepted, go to check the eof property of this packet.
-        if (eof) {
-            _eofFlag = true;
-        }
-        if (eof && empty()) {
-            _output.end_input();
-        }
+        checkEof(eof);
     } else if (index < _headIndex) {
         // Also the same, two situation
         // 1. this packet's index < _headIndex
@@ -89,7 +84,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // find one element which is not less than the elem,
     // if can't find, return end() iterator
     auto iter = _blocks.lower_bound(elem); 
-    cout << "if iter equals end()?: " << (iter == _blocks.end()) << endl;
+    // cout << "if iter equals end()?: " << (iter == _blocks.end()) << endl;
     while (iter != _blocks.end() && ((merged_bytes = merge_block(elem, *iter)) >= 0)) { // merge next
         _unassembledByteAmount -= merged_bytes;
         _blocks.erase(iter);
@@ -103,7 +98,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
             _unassembledByteAmount -= merged_bytes;
             _blocks.erase(iter);
             iter = _blocks.lower_bound(elem);
-            cout << "if iter equals end()?: " << (iter == _blocks.end()) << endl;
+            // cout << "if iter equals end()?: " << (iter == _blocks.end()) << endl;
             if (iter == _blocks.begin()) { // implicit suggestion: _block is empty!
                 break; 
             }

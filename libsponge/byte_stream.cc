@@ -1,4 +1,5 @@
 #include "byte_stream.hh"
+#include <iostream>
 
 // Dummy implementation of a flow-controlled in-memory byte stream.
 
@@ -80,6 +81,7 @@ bool ByteStream::input_ended() const {
 }
 
 size_t ByteStream::buffer_size() const { 
+    cout << "buffer_size: " << _buffer.size() << endl;
     return _buffer.size(); 
 }
 
@@ -92,6 +94,7 @@ bool ByteStream::eof() const {
 }
 
 size_t ByteStream::bytes_written() const { 
+    // cout << "bytes_written: " << _writeCount << endl;
     return _writeCount; }
 
 size_t ByteStream::bytes_read() const { 

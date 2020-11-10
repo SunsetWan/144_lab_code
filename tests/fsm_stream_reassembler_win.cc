@@ -28,7 +28,7 @@ int main() {
 
         // overlapping segments
         for (unsigned rep_no = 0; rep_no < NREPS; ++rep_no) {
-            StreamReassembler buf{NSEGS * MAX_SEG_LEN};
+            StreamReassembler buf{NSEGS * MAX_SEG_LEN}; // _capacity: 262144
 
             vector<tuple<size_t, size_t>> seq_size;
             size_t offset = 0;
@@ -47,9 +47,22 @@ int main() {
                 string dd(d.cbegin() + off, d.cbegin() + off + sz);
                 buf.push_substring(move(dd), off, off + sz == offset);
             }
-
+            cout << endl;
+            cout << "before===" << endl;
+            cout << "bytes_written(): " << buf.stream_out().bytes_written() << endl;
+            cout << "offset: " << offset << endl;
+            cout << "before===" << endl;
+            cout << endl;
             auto result = read(buf);
+            cout << endl;
+            cout << "after===" << endl;
+            cout << "bytes_written(): " << buf.stream_out().bytes_written() << endl;
+            cout << "offset: " << offset << endl;
+            cout << "after===" << endl;
+            cout << endl;
             if (buf.stream_out().bytes_written() != offset) {  // read bytes
+                // cout << "bytes_written: " << buf.stream_out().bytes_written() << "," << "offset: " << offset << endl;
+                // cout << "offset: " << offset << endl;
                 throw runtime_error("test 2 - number of RX bytes is incorrect");
             }
             if (!equal(result.cbegin(), result.cend(), d.cbegin())) {
