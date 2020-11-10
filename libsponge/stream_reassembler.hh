@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <string>
+#include <set>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
@@ -14,6 +15,28 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+
+    struct block_node {
+      size_t begin = 0;
+      size_t length = 0;
+      std::string data = "";
+
+      // This operator is a member func. (C++ Primer, p555)
+      bool operator<(const block_node rhs) const {
+        return this->begin < rhs.begin;
+      }
+    };
+
+    std::set<block_node> _blocks = {};
+    size_t _headIndex = 0;
+    size_t _unassembledByteAmount = 0;
+    bool _eofFlag = false;
+
+    //! merge elm2 to elm1, return merged bytes
+    long merge_block(block_node &elem1, const block_node &elem2);
+    void checkEof(const bool eof);
+
+    
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
@@ -46,6 +69,7 @@ class StreamReassembler {
     //! \brief Is the internal state empty (other than the output stream)?
     //! \returns `true` if no substrings are waiting to be assembled
     bool empty() const;
+
 };
 
 #endif  // SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
