@@ -60,6 +60,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         // 1. this packet is duplicated, so we ignore it.
         // 2. all data have already been accepted, go to check the eof property of this packet.
         checkEof(eof);
+        return; // Don't forget return!
     } else if (index < _headIndex) {
         // Also the same, two situation
         // 1. this packet's index < _headIndex
