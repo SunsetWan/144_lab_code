@@ -47,22 +47,9 @@ int main() {
                 string dd(d.cbegin() + off, d.cbegin() + off + sz);
                 buf.push_substring(move(dd), off, off + sz == offset);
             }
-            cout << endl;
-            cout << "before===" << endl;
-            cout << "bytes_written(): " << buf.stream_out().bytes_written() << endl;
-            cout << "offset: " << offset << endl;
-            cout << "before===" << endl;
-            cout << endl;
+
             auto result = read(buf);
-            cout << endl;
-            cout << "after===" << endl;
-            cout << "bytes_written(): " << buf.stream_out().bytes_written() << endl;
-            cout << "offset: " << offset << endl;
-            cout << "after===" << endl;
-            cout << endl;
             if (buf.stream_out().bytes_written() != offset) {  // read bytes
-                // cout << "bytes_written: " << buf.stream_out().bytes_written() << "," << "offset: " << offset << endl;
-                // cout << "offset: " << offset << endl;
                 throw runtime_error("test 2 - number of RX bytes is incorrect");
             }
             if (!equal(result.cbegin(), result.cend(), d.cbegin())) {

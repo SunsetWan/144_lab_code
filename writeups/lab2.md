@@ -1,4 +1,4 @@
-Lab 1 Writeup
+Lab 2 Writeup
 =============
 
 My name: [your name here]
@@ -7,7 +7,7 @@ My SUNet ID: [your sunetid here]
 
 This lab took me about [n] hours to do.
 
-Program Structure and Design of the StreamReassembler:
+Program Structure and Design of the TCPReceiver:
 []
 
 Implementation Challenges:
