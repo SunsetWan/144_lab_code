@@ -12,6 +12,12 @@ class WrappingInt32 {
 
   public:
     //! Construct from a raw 32-bit unsigned integer
+    // What is 'explicit' keyword?
+    // Prefixing the 'explicit' keyword to the constructor prevents
+    // the compiler from using that constructor for implicit conversions.
+    // The reason you might want to do this is to avoid accidental construction
+    // that can hide bugs.
+    // Ref: https://stackoverflow.com/questions/121162/what-does-the-explicit-keyword-mean#
     explicit WrappingInt32(uint32_t raw_value) : _raw_value(raw_value) {}
 
     uint32_t raw_value() const { return _raw_value; }  //!< Access raw stored value
@@ -61,5 +67,8 @@ inline WrappingInt32 operator+(WrappingInt32 a, uint32_t b) { return WrappingInt
 //! \brief The point `b` steps before `a`.
 inline WrappingInt32 operator-(WrappingInt32 a, uint32_t b) { return a + -b; }
 //!@}
+
+// What is 'inline' keyword?
+// Ref: https://stackoverflow.com/questions/9370493/inline-function-members-inside-a-class
 
 #endif  // SPONGE_LIBSPONGE_WRAPPING_INTEGERS_HH
