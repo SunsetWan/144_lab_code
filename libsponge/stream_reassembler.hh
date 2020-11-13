@@ -70,6 +70,10 @@ class StreamReassembler {
     //! \returns `true` if no substrings are waiting to be assembled
     bool empty() const;
 
+    // Add two getter methods for Lab2
+    size_t headIndex() const { return _headIndex; }
+    bool isInputEnded() const { return _output.input_ended(); }
+
 };
 
 #endif  // SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
