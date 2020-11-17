@@ -25,6 +25,7 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
     // Streams in TCP can be arbitrarily long—there’s no limit to the length of a ByteStream
     // that can be sent over TCP. 
     // So wrapping is pretty common.
+    // So this indicates the low 32 bits of absolute seqno equals the low 32 bits of seqno.
     return WrappingInt32(downCastValue + isn.raw_value());
 }
 
@@ -41,6 +42,7 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
 uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
     uint32_t offset = n.raw_value() - isn.raw_value();
     // if checkpoint < 2^32 - 1, t = offset;
+    // The low 32 bits of absolute seqno equals the low 32 bits of seqno.
     uint64_t t = (checkpoint & 0xFFFFFFFF00000000) + offset;
     uint64_t result = t;
     if (abs(int64_t(t + (1ul << 32) - checkpoint)) < abs(int64_t(t - checkpoint))) {
@@ -50,4 +52,16 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
         result = t - (1ul << 32);
     }
     return result;
+
+    // uint64_t result = 0;
+    // uint64_t twoToThe32Power = (static_cast<uint64_t>(0x00000000FFFFFFFF) + 1);
+    // uint64_t divisor = checkpoint / twoToThe32Power;
+    // result = divisor * twoToThe32Power + static_cast<uint64_t>(offset);
+    // uint64_t diff1 = result > checkpoint ? result - checkpoint : checkpoint - result;
+    // uint64_t diff2 = result + twoToThe32Power - checkpoint;
+    // if (diff1 < diff2) {
+    //     return result;
+    // } else {
+    //     return result + twoToThe32Power;
+    // }
 }
