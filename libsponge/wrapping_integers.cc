@@ -15,7 +15,13 @@ using namespace std;
 //! \param isn The initial sequence number
 WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
     // Ref: https://stackoverflow.com/questions/103512/why-use-static-castintx-instead-of-intx
-    uint32_t downCastValue = static_cast<uint32_t>(n);
+
+    // n mod (2^32)
+    // uint32_t downCastValue = static_cast<uint32_t>(n);
+
+    // Another way of n mod (2^32)
+    uint32_t downCastValue = n % (static_cast<uint64_t>(0x00000000FFFFFFFF) + 1) ;
+
     // Streams in TCP can be arbitrarily long—there’s no limit to the length of a ByteStream
     // that can be sent over TCP. 
     // So wrapping is pretty common.
