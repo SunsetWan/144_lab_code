@@ -64,7 +64,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
 
     _reassembler.push_substring(seg.payload().copy(), absSeqno - 1, seg.header().fin);
     _base = _reassembler.headIndex() + 1;
-    if (_reassembler.isInputEnded()) {
+    if (_reassembler.isInputEnded()) { // FIN segment counts as one byte.
         _base++;
     }
     return true;
