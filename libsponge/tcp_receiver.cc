@@ -11,7 +11,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 bool TCPReceiver::segment_received(const TCPSegment &seg) {
-    bool result = false;
+    // bool result = false;
     size_t absSeqno = 0;
     size_t length;
     if (seg.header().syn) { // This seg's syn bit == 1.
@@ -20,7 +20,7 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         }
 
         _synFlag = true;
-        result = true;
+        // result = true;
 
         // if and only if this seg's syn bit == 1 and TCPReceiver's _synFlag == false, set _isn
         _isn = seg.header().seqno.raw_value();
@@ -39,7 +39,11 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
         return false;
     } else { // TCPReceiver has already received a SYN, but this seg's SYN == 0.
         WrappingInt32 isn = WrappingInt32(_isn);
+
+        // In your TCP implementation, 
+        // you’ll use the index of the last reassembled byte as the checkpoint.
         absSeqno = unwrap(seg.header().seqno, isn, absSeqno);
+
         length = seg.length_in_sequence_space();
     }
 
@@ -48,13 +52,14 @@ bool TCPReceiver::segment_received(const TCPSegment &seg) {
             return false;
         }
         _finFlag = true;
-        result = true;
+        // result = true;
     } else if (seg.length_in_sequence_space() == 0 && absSeqno == _base) {
         return true;
     } else if (absSeqno >= _base + window_size() || absSeqno + length <= _base) {
-        if (!result) {
-            return false;
-        }
+        // if (!result) {
+        //     return false;
+        // }
+        return false;
     }
 
     _reassembler.push_substring(seg.payload().copy(), absSeqno - 1, seg.header().fin);
