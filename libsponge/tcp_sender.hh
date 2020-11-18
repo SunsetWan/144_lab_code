@@ -32,6 +32,31 @@ class TCPSender {
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
 
+    // Keep track of which segments have been sent 
+    // but not yet acknowledged by the receiver
+    // we call these “outstanding” segments
+    std::queue<TCPSegment> _segments_outstanding{};
+
+    size_t _bytesInFlight = 0;
+
+    size_t _rcvAckno = 0;
+
+    bool _synFlag = false;
+
+    bool _finFlag = false;
+
+    size_t _windowSize = 0;
+
+    size_t _timer = 0;
+
+    bool isTimerRunning = false;
+    
+    size_t _retransmissionTimeout = 0;
+
+    size_t _consecutiveRetransmission = 0;
+
+    void send_segment(TCPSegment & seg);
+
   public:
     //! Initialize a TCPSender
     TCPSender(const size_t capacity = TCPConfig::DEFAULT_CAPACITY,
