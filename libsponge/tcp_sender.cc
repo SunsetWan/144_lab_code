@@ -41,10 +41,10 @@ void TCPSender::fill_window() {
     // // set initial window size to 1 when _windowSize 
     // size_t wndSize = _windowSize > 0 ? _windowSize : 1;
     size_t remainingWndSize;
-    size_t currentOccupiedSize = _next_seqno - _rcvAckno;
+    size_t currentUnackedSegments = _next_seqno - _rcvAckno;
 
     // if TCPSender's window size != 0 and didn't sent FIN segement, it can continue to send data.
-    while ((remainingWndSize = _windowSize - currentOccupiedSize) != 0 && !_finFlag) {
+    while ((remainingWndSize = _windowSize - currentUnackedSegments) != 0 && !_finFlag) {
         size_t size = min(TCPConfig::MAX_PAYLOAD_SIZE, remainingWndSize);
         TCPSegment seg;
         string payloadData = _stream.read(size); // TCPSender reads data from Application layer.
@@ -54,7 +54,7 @@ void TCPSender::fill_window() {
         seg.payload() = Buffer(std::move(payloadData));
 
         // Add FIN segement if necessary.
-        if (seg.length_in_sequence_space() < _windowSize && _stream.eof()) {
+        if (seg.length_in_sequence_space() < remainingWndSize && _stream.eof()) {
             seg.header().fin = 1;
             _finFlag = true;
         }
@@ -68,6 +68,10 @@ void TCPSender::fill_window() {
         }
 
         send_segment(seg);
+
+        // In a *while* loop,
+        // It's careless that forgetting updating the loop condition!
+        currentUnackedSegments = _next_seqno - _rcvAckno;
     }
 
 }
