@@ -28,14 +28,16 @@ uint64_t TCPSender::bytes_in_flight() const {
 }
 
 //! \brief create and send segments to fill as much of the window as possible
-void TCPSender::fill_window() {
+void TCPSender::fill_window(bool is_able_to_send_syn) {
     // Before starting sending data, 
     // TCPSender should send SYN segment first if _synFlag = false;
     if (!_synFlag) { 
-        TCPSegment synSeg;
-        synSeg.header().syn = 1;
-        send_segment(synSeg);
-        _synFlag = true;
+        if (is_able_to_send_syn) {
+            TCPSegment synSeg;
+            synSeg.header().syn = 1;
+            send_segment(synSeg);
+            _synFlag = true;
+        }
         return;
     }
 

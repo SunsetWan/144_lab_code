@@ -35,7 +35,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
 
     _time_since_last_segment_rcved = 0;
 
-    //
+    // (Need comments)
     if (in_syn_sent_state() && seg.header().ack == 1 && seg.payload().size() > 0) {
         return;
     }
@@ -48,6 +48,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         }
     }
 
+    // Hand over to TCPReceiver
     bool rcv_flag = _receiver.segment_received(seg);
     if (!rcv_flag) {
         send_empty = true;
@@ -108,7 +109,7 @@ void TCPConnection::end_input_stream() {
 }
 
 void TCPConnection::connect() {
-    push_segments_out();
+    push_segments_out(true);
 }
 
 TCPConnection::~TCPConnection() {
@@ -124,9 +125,9 @@ TCPConnection::~TCPConnection() {
     }
 }
 
-bool TCPConnection::push_segments_out() {
+bool TCPConnection::push_segments_out(bool is_able_to_send_syn) {
     //
-    _sender.fill_window();
+    _sender.fill_window(is_able_to_send_syn || in_syn_rcv_state());
 
     TCPSegment seg;
     while (!_sender.segments_out().empty()) {

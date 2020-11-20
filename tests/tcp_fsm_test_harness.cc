@@ -78,7 +78,7 @@ void TCPTestHarness::send_fin(const WrappingInt32 seqno, const optional<Wrapping
         step.with_ack(true).with_ackno(ackno.value());
     }
     step.with_fin(true).with_seqno(seqno).with_win(DEFAULT_TEST_WINDOW);
-    execute(step);
+    execute(step, "execute send_fin");
 }
 
 //! \param[in] seqno is the sequence number of the segment
@@ -89,7 +89,7 @@ void TCPTestHarness::send_ack(const WrappingInt32 seqno, const WrappingInt32 ack
     if (swin.has_value()) {
         win = swin.value();
     }
-    execute(SendSegment{}.with_ack(true).with_ackno(ackno).with_seqno(seqno).with_win(win));
+    execute(SendSegment{}.with_ack(true).with_ackno(ackno).with_seqno(seqno).with_win(win), "execute send_ack");
 }
 
 //! \param[in] seqno is the sequence number of the segment
@@ -100,7 +100,7 @@ void TCPTestHarness::send_rst(const WrappingInt32 seqno, const optional<Wrapping
         step.with_ack(true).with_ackno(ackno.value());
     }
     step.with_rst(true).with_seqno(seqno).with_win(DEFAULT_TEST_WINDOW);
-    execute(step);
+    execute(step, "execute send_rst");
 }
 
 //! \param[in] seqno is the sequence number of the segment
@@ -111,7 +111,7 @@ void TCPTestHarness::send_syn(const WrappingInt32 seqno, const optional<Wrapping
         step.with_ack(true).with_ackno(ackno.value());
     }
     step.with_syn(true).with_seqno(seqno).with_win(DEFAULT_TEST_WINDOW);
-    execute(step);
+    execute(step, "execute send_syn");
 }
 
 //! \param[in] seqno is the sequence number of the segment
@@ -123,7 +123,7 @@ void TCPTestHarness::send_byte(const WrappingInt32 seqno, const optional<Wrappin
         step.with_ack(true).with_ackno(ackno.value());
     }
     step.with_payload_size(1).with_data(string{&val, &val + 1}).with_seqno(seqno).with_win(DEFAULT_TEST_WINDOW);
-    execute(step);
+    execute(step, "execute send_byte");
 }
 
 //! \param[in] seqno is the sequence number of the segment
@@ -138,7 +138,7 @@ void TCPTestHarness::send_data(const WrappingInt32 seqno, const WrappingInt32 ac
                 .with_payload_size(1)
                 .with_data(string{begin, end})
                 .with_seqno(seqno)
-                .with_win(DEFAULT_TEST_WINDOW));
+                .with_win(DEFAULT_TEST_WINDOW), "execute data");
 }
 
 void TCPTestHarness::execute(const TCPTestStep &step, std::string note) {
@@ -181,7 +181,7 @@ TCPSegment TCPTestHarness::expect_seg(const ExpectSegment &expectation, std::str
 //! Create a FSM in the "LISTEN" state.
 TCPTestHarness TCPTestHarness::in_listen(const TCPConfig &cfg) {
     TCPTestHarness h{cfg};
-    h.execute(Listen{});
+    h.execute(Listen{}, "execute Listen");
     return h;
 }
 

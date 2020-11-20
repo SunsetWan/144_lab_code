@@ -79,7 +79,7 @@ class TCPSender {
     void send_empty_segment();
 
     //! \brief create and send segments to fill as much of the window as possible
-    void fill_window();
+    void fill_window(bool is_able_to_send_syn = true);
 
     //! \brief Notifies the TCPSender of the passage of time
     void tick(const size_t ms_since_last_tick);
