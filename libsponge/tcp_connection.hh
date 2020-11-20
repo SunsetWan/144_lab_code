@@ -22,16 +22,16 @@ class TCPConnection {
     bool _linger_after_streams_finish{true};
 
     size_t _time_since_last_segment_rcved = 0;
-    bool is_connection_active = true;
-    bool is_ack_for_FIN_sent = false;
-    bool push_segments_out = false;
+    bool _is_connection_active = true;
+    bool _need_send_rst = false;
+    bool _is_ack_for_FIN_sent = false;
 
-
+    bool push_segments_out();
     void unclean_shutdown(bool send_syn);
-    bool clean_shutdown(bool send_rst);
-    bool in_listen();
-    bool in_syn_rcv();
-    bool in_syn_sent();
+    bool clean_shutdown();
+    bool in_listen_state();
+    bool in_syn_rcv_state();
+    bool in_syn_sent_state();
 
   public:
     //! \name "Input" interface for the writer
