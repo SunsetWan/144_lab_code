@@ -81,7 +81,7 @@ bool ByteStream::input_ended() const {
 }
 
 size_t ByteStream::buffer_size() const { 
-    cout << "buffer_size: " << _buffer.size() << endl;
+    // cout << "buffer_size: " << _buffer.size() << endl;
     return _buffer.size(); 
 }
 
