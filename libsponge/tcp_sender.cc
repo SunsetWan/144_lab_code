@@ -163,7 +163,7 @@ unsigned int TCPSender::consecutive_retransmissions() const {
 }
 
 void TCPSender::send_empty_segment() {
-    // An empty ACK doesn’t need to be remembered or retransmitted.
+    // An empty doesn’t need to be remembered or retransmitted.
     TCPSegment emptySeg;
     emptySeg.header().seqno = wrap(_next_seqno, _isn);
     _segments_out.push(emptySeg);

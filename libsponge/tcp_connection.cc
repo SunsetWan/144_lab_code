@@ -35,7 +35,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
 
     _time_since_last_segment_rcved = 0;
 
-    // We need a ACK segment without payload!
+    // In syn sent state, we need a ACK segment without payload!
     if (in_syn_sent_state() && seg.header().ack == 1 && seg.payload().size() > 0) {
         return;
     }
@@ -48,13 +48,13 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         }
     }
 
-    // Hand over to TCPReceiver
     bool rcv_flag = _receiver.segment_received(seg);
     if (!rcv_flag) {
         send_empty = true;
     }
 
     // Try to establish connection
+    // The local is now passive opener
     if (seg.header().syn && in_listen_state()) {
         connect();
         return;
@@ -69,9 +69,9 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         return;
     }
 
-    if (seg.length_in_sequence_space() > 0) {
-        send_empty = true;
-    }
+    // if (seg.length_in_sequence_space() > 0) {
+    //     send_empty = true;
+    // }
 
     // When do I need to send empty segments?
     // If the segment occupied any sequence numbers, 
@@ -133,10 +133,10 @@ TCPConnection::~TCPConnection() {
     }
 }
 
-bool TCPConnection::push_segments_out(bool is_active_opener) {
+bool TCPConnection::push_segments_out(bool is_able_to_send_syn) {
     // If the local is not active opener,
     // the local don't need to send SYN before rcv a SYN
-    _sender.fill_window(is_active_opener || in_syn_rcv_state());
+    _sender.fill_window(is_able_to_send_syn || in_syn_rcv_state());
 
     TCPSegment seg;
     while (!_sender.segments_out().empty()) {
