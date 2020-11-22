@@ -45,7 +45,7 @@ class TCPSender {
 
     bool _finFlag = false;
 
-    size_t _windowSize = 1;
+    size_t _windowSize = 0;
 
     size_t _timer = 0;
 

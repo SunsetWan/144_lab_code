@@ -27,7 +27,7 @@ class TCPConnection {
     bool _is_ack_for_FIN_sent = false;
 
     bool push_segments_out(bool is_able_to_send_syn = false);
-    void unclean_shutdown(bool send_syn);
+    void unclean_shutdown(bool send_rst);
     bool clean_shutdown();
     bool in_listen_state();
     bool in_syn_rcv_state();

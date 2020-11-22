@@ -41,13 +41,16 @@ void TCPSender::fill_window(bool is_able_to_send_syn) {
         return;
     }
 
-    // // set initial window size to 1 when _windowSize 
-    // size_t wndSize = _windowSize > 0 ? _windowSize : 1;
     size_t remainingWndSize;
     size_t currentUnackedSegments = _next_seqno - _rcvAckno;
 
+    // Take _windowSize as 1 when it equal 0.
+    // It's called 'zero window probing'.
+    // For ref: check page 282.
+    size_t win = _windowSize > 0 ? _windowSize : 1;
+
     // if TCPSender's window size != 0 and didn't sent FIN segement, it can continue to send data.
-    while ((remainingWndSize = _windowSize - currentUnackedSegments) != 0 && !_finFlag) {
+    while ((remainingWndSize = win - currentUnackedSegments) != 0 && !_finFlag) {
         size_t size = min(TCPConfig::MAX_PAYLOAD_SIZE, remainingWndSize);
         TCPSegment seg;
         string payloadData = _stream.read(size); // TCPSender reads data from Application layer.

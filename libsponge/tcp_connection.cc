@@ -42,7 +42,8 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
 
     bool send_empty = false;
     if (_sender.next_seqno_absolute() > 0 && seg.header().ack == 1) {
-        //
+        // When sender in SYN_SENT state and unacceptable ACK arrives,
+        // Need to make sure it gets acknowledged
         if (!_sender.ack_received(seg.header().ackno, seg.header().win)) {
             send_empty = true;
         }
@@ -79,10 +80,10 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         return;
     }
 
-    // ?*
-    if (seg.length_in_sequence_space() > 0) {
-        send_empty = true;
-    }
+    // Be prepared to debug t_active_close
+    // if (seg.length_in_sequence_space() > 0) {
+    //     send_empty = true;
+    // }
 
     // When do I need to send empty segments?
     // If the segment occupied any sequence numbers, 
@@ -91,7 +92,12 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     // with an appropriate sequence number and the new ackno and window size.
     if (send_empty) {
         if (_receiver.ackno().has_value() && _sender.segments_out().empty()) { // ?
-            //
+            // The TCPSender should generate and send a TCPSegment that has zero length in sequence space, 
+            // and with the sequence number set correctly to next seqno. 
+            // This is useful if the owner (the TCPConnection that you’re going to implement next week) wants 
+            // to send an empty ACK segment. 
+            // This kind of segment—one that carries no data and occupies no sequence numbers doesn’t need
+            // to be kept track of as “outstanding” and won’t ever be retransmitted.
             _sender.send_empty_segment();
         }
     }
@@ -128,6 +134,7 @@ void TCPConnection::end_input_stream() {
 }
 
 void TCPConnection::connect() {
+    // need to send SYN segment first.
     push_segments_out(true);
 }
 
