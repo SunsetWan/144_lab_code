@@ -55,7 +55,17 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
 
     // Try to establish connection
     // The local is now passive opener
-    if (seg.header().syn && in_listen_state()) {
+    // if this segment's syn bit == 1,
+    // TCPReceiver State: *SYN_RCVED*
+    // TCPSender State: *CLOSED* (sender.next_seqno_absolute() == 0)
+    // TCPSender need to send [SYN] [ACK].
+    // TCPConnection isn't in *LISTEN* state any more.
+
+    //case TCPState::State::LISTEN:
+    //  _receiver = TCPReceiverStateSummary::LISTEN;
+    //  _sender = TCPSenderStateSummary::CLOSED;
+
+    if (seg.header().syn && _sender.next_seqno_absolute() == 0) { // Error!
         connect();
         return;
     }
