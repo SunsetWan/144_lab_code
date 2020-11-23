@@ -81,9 +81,9 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     }
 
     // Be prepared to debug t_active_close
-    // if (seg.length_in_sequence_space() > 0) {
-    //     send_empty = true;
-    // }
+    if (seg.length_in_sequence_space() > 0) {
+        send_empty = true;
+    }
 
     // When do I need to send empty segments?
     // If the segment occupied any sequence numbers, 
