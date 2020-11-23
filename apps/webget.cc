@@ -1,4 +1,5 @@
-#include "socket.hh"
+// #include "socket.hh"
+#include "tcp_sponge_socket.hh"
 #include "util.hh"
 
 #include <cstdlib>
@@ -8,7 +9,8 @@ using namespace std;
 
 void get_URL(const string &host, const string &path) {
     Address addr = Address(host, "http");
-    TCPSocket socket = TCPSocket();
+    // TCPSocket socket = TCPSocket();
+    CS144TCPSocket socket = CS144TCPSocket();
 
     // After this line of code is executed,
     // the 3-way handshake is performed
@@ -33,8 +35,11 @@ void get_URL(const string &host, const string &path) {
     }
 
     socket.close();
-    return;
 
+
+    // Lab4 appended
+    socket.wait_until_closed();
+    return;
 }
 
 int main(int argc, char *argv[]) {
