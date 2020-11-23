@@ -2,10 +2,28 @@
 
 #include <iostream>
 
-// Dummy implementation of a TCP connection
+// When need to send empty segments?
 
-// For Lab 4, please replace with a real implementation that passes the
-// automated checks run by `make check`.
+// Situation 1:
+// On receiving a segment, what should I do if the TCPReceiver complains that the segment didn’t overlap the window and was unacceptable (segment received() returns false)?
+// In that situation, the TCPConnection needs to make sure that a segment is sent back to the peer, giving the current ackno and window size. 
+// This can help correct a confused peer.
+
+// Situation 2:
+// How about if the TCPConnection received a segment, and the TCPSender complains that an ackno was invalid (ack received() returns false)?
+// Same answer!
+
+// Situation 3:
+// How about if the TCPConnection received a segment, and everything was great? Do I still need to reply?
+// If the segment occupied any sequence numbers, then you need to make sure it gets acknowledged 
+// at least one segment needs to be sent back to the peer with an appropriate sequence number 
+// and the new ackno and window size. 
+// You might not need to do anything to force this, 
+// because the TCPSender will often decide to send a new segment in ack received() (because more space has opened up in the window). 
+// But even if the TCPSender doesn’t have more data to send, 
+// you need to make sure the incoming segment gets acknowledged somehow.
+
+
 
 template <typename... Targs>
 void DUMMY_CODE(Targs &&... /* unused */) {}
@@ -43,12 +61,13 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     bool send_empty = false;
     if (_sender.next_seqno_absolute() > 0 && seg.header().ack == 1) {
         // When sender in SYN_SENT state and unacceptable ACK arrives,
-        // Need to make sure it gets acknowledged
+        // Need to make sure it gets acknowledged [Situation #1]
         if (!_sender.ack_received(seg.header().ackno, seg.header().win)) {
             send_empty = true;
         }
     }
 
+    // [Situation #2]
     bool rcv_flag = _receiver.segment_received(seg);
     if (!rcv_flag) {
         send_empty = true;
@@ -80,7 +99,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         return;
     }
 
-    // Be prepared to debug t_active_close
+    // [Situation #3]
     if (seg.length_in_sequence_space() > 0) {
         send_empty = true;
     }
@@ -91,7 +110,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     // at least one segment needs to be sent back to the peer 
     // with an appropriate sequence number and the new ackno and window size.
     if (send_empty) {
-        if (_receiver.ackno().has_value() && _sender.segments_out().empty()) { // ?
+        if (_receiver.ackno().has_value() && _sender.segments_out().empty()) { 
             // The TCPSender should generate and send a TCPSegment that has zero length in sequence space, 
             // and with the sequence number set correctly to next seqno. 
             // This is useful if the owner (the TCPConnection that you’re going to implement next week) wants 
