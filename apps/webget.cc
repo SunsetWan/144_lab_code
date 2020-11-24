@@ -10,7 +10,8 @@ using namespace std;
 void get_URL(const string &host, const string &path) {
     Address addr = Address(host, "http");
     // TCPSocket socket = TCPSocket();
-    CS144TCPSocket socket = CS144TCPSocket();
+    // CS144TCPSocket socket = CS144TCPSocket();
+    FullStackSocket socket = FullStackSocket();
 
     // After this line of code is executed,
     // the 3-way handshake is performed
