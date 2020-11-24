@@ -67,12 +67,12 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
         // return the resulting InternetDatagram to the caller.
         if (ipDatagram.parse(frame.payload()) == ParseResult::NoError) {
             return ipDatagram;
-        } else
+        } else {
             return std::nullopt;
         }
     } else if(frame.header().type == EthernetHeader::TYPE_ARP) {
         ARPMessage msg;
-        if (reply.parse(frame.payload()) == ParseResult::NoError) {
+        if (msg.parse(frame.payload()) == ParseResult::NoError) {
             uint32_t ipAddr = msg.sender_ip_address;
 
             // Update mapping table
@@ -82,6 +82,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
             _mapping_table[ipAddr].time_to_live_value = _timer + 30 * 1000;
 
             // This ARPMessage comes here because of me!
+            // So I need to reply to it!
             if (msg.opcode == ARPMessage::OPCODE_REQUEST && msg.target_ip_address == _ip_address.ipv4_numeric()) {
                 ARPMessage reply;
                 reply.opcode = ARPMessage::OPCODE_REPLY;
@@ -97,9 +98,32 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
                 arp_frame.payload() = move(reply.serialize());
                 _frames_out.push(arp_frame);
             }
+            // Because mapping table has been updated.
+            // Check the _pending queue.
+            while (!_pending_arg.empty()) {
+                uint32_t ipAddr_in_pending = _pending_arg.front();
+                if (_mapping_table.count(ipAddr_in_pending) && _timer <= _mapping_table[ipAddr_in_pending].time_to_live_value) {
+                    _pending_arg.pop();
+                    _is_pending_flag = false;
+                } else {
+                    break;
+                }
+            }
 
-            
+            while (!_frame_waitting_queue.empty()) {
+                WaittingFrame item = _frame_waitting_queue.front();
+                if (_mapping_table.count(item.ipAddr) && _timer <= _mapping_table[item.ipAddr].time_to_live_value) {
+                    item.frame.header().dst = _mapping_table[item.ipAddr].macAddr;
+                    _frame_waitting_queue.pop();
+                    _frames_out.push(std::move(item.frame));
+                } else {
+                    break;
+                }
+            }
         }
+        return std::nullopt;
+    } else {
+        return std::nullopt;
     }
 }
 
@@ -123,7 +147,7 @@ void NetworkInterface::retransmission_arp_packet() {
     if (!_pending_arg.empty()) {
         // You don’t want to ﬂood the network with ARP requests. 
         // If the network interface already sent an ARP request about the same IP address in the last ﬁve seconds, 
-        // don’t send a second request—just wait for a reply to the ﬁrst one.
+        // don’t send a second request just wait for a reply to the ﬁrst one.
         // Again, queue the datagram until you learn the destination Ethernet address.
         if (!_is_pending_flag || (_is_pending_flag && ((_timer - _pending_timer) > 5000))) {
             uint32_t ipAddr = _pending_arg.front();
@@ -137,7 +161,7 @@ void NetworkInterface::retransmission_arp_packet() {
             msg.target_ip_address = ipAddr;
             // What we request is the corresponding ethernet addr of ipAddr.
             // So for now, let it be arbitrary.
-            msg.target_ethernet_address = {0, 0, 0, 0, 0, 0}; 
+            msg.target_ethernet_address = {1, 2, 3, 4, 5, 6}; 
 
             EthernetFrame frame_with_arp_msg_inside;
             frame_with_arp_msg_inside.header().type = EthernetHeader::TYPE_ARP;
