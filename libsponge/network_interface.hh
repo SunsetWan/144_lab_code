@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <queue>
+#include <map>
 
 //! \brief A "network interface" that connects IP (the internet layer, or network layer)
 //! with Ethernet (the network access layer, or link layer).
@@ -39,6 +40,32 @@ class NetworkInterface {
 
     //! outbound queue of Ethernet frames that the NetworkInterface wants sent
     std::queue<EthernetFrame> _frames_out{};
+
+    struct ARPItem {
+      EthernetAddress macAddr;
+
+      // For ref: the `Related issue` part of https://tools.ietf.org/html/rfc826
+      //
+      size_t time_to_live_value;
+    };
+
+    struct WaittingFrame 
+    {
+      EthernetFrame frame;
+      uint32_t ipAddr;
+    };
+
+    std::map<uint32_t, ARPItem> _mapping_table {};
+    std::queue<WaittingFrame> _frame_waitting_queue {};
+    std::queue<uint32_t> _pending_arg {};
+    bool _is_pending_flag = false;
+    size_t _pending_timer = 0;
+    size_t _timer = 0;
+
+
+    bool is_ethernet_addr_equal(EthernetAddress addr1, EthernetAddress addr2);
+    void retransmission_arp_packet();
+    
 
   public:
     //! \brief Construct a network interface with given Ethernet (network-access-layer) and IP (internet-layer) addresses
