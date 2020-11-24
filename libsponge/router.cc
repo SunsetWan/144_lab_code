@@ -99,3 +99,6 @@ void Router::route() {
         }
     }
 }
+
+// Wow! Congratulate to myself, all CS144 labs are done!
+// Where there's a will, there's a way!
