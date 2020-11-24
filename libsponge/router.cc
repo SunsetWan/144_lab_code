@@ -51,6 +51,8 @@ void Router::route_one_datagram(InternetDatagram &dgram) {
     bool isFound = false;
     uint32_t targetIPAddr = dgram.header().dst;
     
+    // Look route up in forwardingTable
+    // The time complexity of linear searching is O(n).
     for (size_t i = 0; i < forwardingTable.size(); i++) {
         if (is_prefix_equal(targetIPAddr, forwardingTable[i].route_prefix, forwardingTable[i].prefix_length)) {
             if (!isFound || entry.prefix_length < forwardingTable[i].prefix_length) {
