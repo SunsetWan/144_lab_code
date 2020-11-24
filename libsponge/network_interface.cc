@@ -120,11 +120,12 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
                     break;
                 }
             }
+        } else {
+            return std::nullopt;
         }
+        
+    } 
         return std::nullopt;
-    } else {
-        return std::nullopt;
-    }
 }
 
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
@@ -160,8 +161,8 @@ void NetworkInterface::retransmission_arp_packet() {
 
             msg.target_ip_address = ipAddr;
             // What we request is the corresponding ethernet addr of ipAddr.
-            // So for now, let it be arbitrary.
-            msg.target_ethernet_address = {1, 2, 3, 4, 5, 6}; 
+            // In an ARP request this field is ignored, make it be 0.
+            msg.target_ethernet_address = {0, 0, 0, 0, 0, 0}; 
 
             EthernetFrame frame_with_arp_msg_inside;
             frame_with_arp_msg_inside.header().type = EthernetHeader::TYPE_ARP;
