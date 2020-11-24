@@ -47,7 +47,7 @@ class Router {
       struct RouteEntry {
         uint32_t route_prefix = 0;
         uint8_t prefix_length = 0;
-        std::optional<Address> next_hop == std::nullopt;
+        std::optional<Address> next_hop = std::nullopt;
         size_t network_interface_number = 0;
     };
 
@@ -61,7 +61,7 @@ class Router {
     //! datagram's destination address.
     void route_one_datagram(InternetDatagram &dgram);
 
-    bool is_prefix_equal(uint32_t ipAddr1, uint32_t ipAddr2, uint8_t len);
+    bool is_prefix_equal(uint32_t targetIPAddr, uint32_t route_prefix, uint8_t prefix_length);
 
   public:
     //! Add an interface to the router
