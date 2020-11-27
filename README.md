@@ -1,3 +1,12 @@
+
+`master` 分支对应 Lab 0 的 solution，
+以此类推...
+`lab6-starter` 对应 Lab 6 的 solution。
+整个 Lab 的所有讲义均在 `master` 分支的 `Lab_handouts` 文件夹中。
+`Sponge` 库的文档：[link](https://cs144.github.io/doc/lab0/annotated.html)
+
+-------
+
 For build prereqs, see [the CS144 VM setup instructions](https://web.stanford.edu/class/cs144/vm_howto).
 
 ## Sponge quickstart
